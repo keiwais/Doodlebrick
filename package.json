@@ -1,0 +1,11 @@
+{
+  "name": "doodlebrick",
+  "version": "1.0.0",
+  "description": "Learn to draw by building with shapes. Trace photos, get a live accuracy score, and ask an AI coach.",
+  "private": true,
+  "scripts": {
+    "start": "node server/server.js",
+    "test": "node tests/test_vision.js && node tests/test_app.js && node tests/test_server.js"
+  },
+  "engines": { "node": ">=18" }
+}

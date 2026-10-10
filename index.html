@@ -1,0 +1,472 @@
+<!-- uwu -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DoodleBrick — draw, trace &amp; animate</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ============ HEADER ============ -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true"><span class="dot p"></span><span class="dot m"></span><span class="dot g"></span><span class="dot y"></span></div>
+      <div class="brand-text">
+        <span class="brand-name">DoodleBrick</span>
+        <span class="project-line"><span id="projTitle" class="proj-title" contenteditable="true" spellcheck="false" role="textbox" aria-label="Project title">Untitled canvas</span> <span class="status-tag" id="saveTag">Saved</span></span>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <button class="hbtn" data-action="undo" title="Undo"><svg viewBox="0 0 24 24" width="16" height="16"><path d="M9 14L4 9l5-5" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 9h10a6 6 0 0 1 0 12h-1" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Undo</span></button>
+      <button class="hbtn" data-action="redo" title="Redo"><svg viewBox="0 0 24 24" width="16" height="16"><path d="M15 14l5-5-5-5" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 9H10a6 6 0 0 0 0 12h1" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Redo</span></button>
+      <div class="gallery-wrap">
+        <button class="hbtn" id="galleryBtn" title="Your progress"><svg viewBox="0 0 24 24" width="16" height="16"><rect x="3" y="4" width="18" height="16" rx="1.5" stroke="currentColor" stroke-width="2" fill="none"/><path d="M4 17l5-5 4 4 3-3 4 4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Gallery</span></button>
+        <div class="gallery-pop" id="galleryPop">
+          <div class="gallery-stat" id="galleryStat"><strong>0</strong><span>drawings saved</span></div>
+          <div class="gallery-strip" id="galleryStrip"></div>
+          <div class="gallery-note" id="galleryNote">Nothing saved yet.</div>
+          <div class="gallery-actions"><button class="hbtn primary" id="saveGalleryBtn">Save drawing</button><button class="hbtn" id="newCanvasBtn">New canvas</button></div>
+        </div>
+      </div>
+      <button class="hbtn primary" data-action="export" title="Export project"><svg viewBox="0 0 24 24" width="16" height="16"><path d="M12 3v12" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round"/><path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 19h16" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg><span>Export</span></button>
+    </div>
+  </header>
+
+  <!-- ============ MODE SWITCH ============ -->
+  <div class="mode-switch" id="modeSwitch">
+    <button class="mode-btn active" data-view="draw">Draw</button>
+    <button class="mode-btn" data-view="pixel">Pixel Builder</button>
+    <button class="mode-btn" data-view="animate">Animate</button>
+    <button class="mode-btn" data-view="ai">AI Studio</button>
+  </div>
+
+  <!-- ============ WORKSPACE ============ -->
+  <div class="workspace">
+
+    <!-- TOOL RAIL -->
+    <nav class="category-rail" id="toolRail">
+      <button class="rail-btn" data-tool="shapes" style="--accent:var(--pink)"><svg viewBox="0 0 24 24" width="19" height="19"><rect x="3" y="3" width="7" height="7" rx="1.5" fill="currentColor"/><circle cx="17.5" cy="6.5" r="4" fill="currentColor"/><path d="M4 21l6-11 6 11z" fill="currentColor"/></svg><span>Shapes</span></button>
+      <button class="rail-btn" data-tool="fill" style="--accent:var(--green)"><svg viewBox="0 0 24 24" width="19" height="19"><path d="M4 12l7-7 7 7-7 7z" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/></svg><span>Fill</span></button>
+      <button class="rail-btn" data-tool="text" style="--accent:var(--gold)"><svg viewBox="0 0 24 24" width="19" height="19"><path d="M5 5h14M12 5v14" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg><span>Text</span></button>
+      <button class="rail-btn" data-tool="trace" style="--accent:var(--cream)"><svg viewBox="0 0 24 24" width="19" height="19"><rect x="3" y="4" width="18" height="16" rx="1.5" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="9" cy="10" r="1.6" fill="currentColor"/><path d="M4 17l5-5 4 4 3-3 4 4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Trace</span></button>
+      <button class="rail-btn" data-tool="motion" style="--accent:var(--mint)"><svg viewBox="0 0 24 24" width="19" height="19"><rect x="3" y="6" width="18" height="13" rx="1.5" stroke="currentColor" stroke-width="2" fill="none"/><path d="M3 10l4.5-4M9 10l4.5-4M15 10l4.5-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Motion</span></button>
+    </nav>
+
+    <!-- CANVAS -->
+    <main class="canvas-area">
+      <div class="canvas-topbar">
+        <div class="mode-badge">
+          <svg viewBox="0 0 24 24" width="14" height="14"><path d="m4 16.5 10.6-10.6a2.1 2.1 0 0 1 3 3L7 19.5 3 21z" fill="currentColor"/><path d="m12.8 7.7 3.5 3.5" stroke="var(--white)" stroke-width="1.5"/></svg>
+          Draw &amp; trace <span>Canvas workspace</span>
+        </div>
+        <div class="canvas-controls">
+          <button class="cbtn" id="bgBtn" title="Cycle canvas background colour">Background</button>
+          <span class="zoom-tag" id="zoomTag">100%</span>
+        </div>
+      </div>
+
+      <!-- DRAW VIEW -->
+      <div class="view active" data-view="draw">
+        <div class="artboard-stage">
+          <div class="artboard">
+            <div class="accuracy-badge hidden" id="accBadge"><svg viewBox="0 0 24 24" width="13" height="13"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="12" cy="12" r="4.5" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg><span id="accBadgeText">Tracing accuracy —</span></div>
+            <div class="board" id="board">
+              <canvas id="refCanvas" class="layer-canvas" aria-hidden="true"></canvas>
+              <canvas id="drawCanvas" class="layer-canvas" aria-hidden="true"></canvas>
+              <canvas id="fxCanvas" class="layer-canvas" role="img" aria-label="Drawing canvas. Use the tools to draw; Ctrl+Z undoes."></canvas>
+            </div>
+            <div class="ghost-bar hidden" id="ghostBar" role="status"><span id="ghostLabel">Next: Circle</span><button class="hbtn primary" id="ghostAccept">Accept</button><button class="hbtn" id="ghostSkip">Skip</button></div>
+          </div>
+        </div>
+
+        <!-- DOCK -->
+        <div class="dock" id="toolDock">
+          <div class="dock-tools">
+            <button class="dock-tool" data-tool="select" title="Select"><svg viewBox="0 0 24 24" width="18" height="18"><path d="M5 3l6 16 2.4-6.6L20 10z" fill="currentColor"/></svg><span>Select</span></button>
+            <button class="dock-tool" data-tool="brush" title="Brush"><svg viewBox="0 0 24 24" width="18" height="18"><path d="M9 15l9-11 2 2-11 9z" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/><path d="M7 17c-2 0-3.5 1.3-4 4 3-.3 5-1 6-3z" fill="currentColor"/></svg><span>Brush</span></button>
+            <button class="dock-tool" data-tool="erase" title="Erase"><svg viewBox="0 0 24 24" width="18" height="18"><rect x="4" y="11" width="14" height="7" rx="1.5" transform="rotate(-20 11 14.5)" fill="currentColor"/></svg><span>Erase</span></button>
+            <button class="dock-tool" data-tool="smudge" title="Smudge"><svg viewBox="0 0 24 24" width="18" height="18"><path d="M12 21c-4 0-7-2.7-7-6.3C5 10.6 9 6 12 3c3 3 7 7.6 7 11.7C19 18.3 16 21 12 21z" stroke="currentColor" stroke-width="2" fill="none"/><path d="M12 17a3 3 0 0 0 3-3" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg><span>Smudge</span></button>
+            <button class="dock-tool" data-tool="picker" title="Color picker"><svg viewBox="0 0 24 24" width="18" height="18"><path d="M13 6l5 5-8.5 8.5H5v-4.5z" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/><path d="M15 4l5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Picker</span></button>
+            <button class="dock-tool" data-tool="pan" title="Pan"><svg viewBox="0 0 24 24" width="18" height="18"><path d="M12 2v20M2 12h20M5 6l-3 6 3 6M19 6l3 6-3 6M6 5l6-3 6 3M6 19l6 3 6-3" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Pan</span></button>
+          </div>
+          <div class="dock-divider"></div>
+          <div class="dock-stats">
+            <label class="dock-stat"><span class="dock-stat-label">Size</span><span class="dock-stat-value"><b id="dockSizeVal">8</b> px</span><input type="range" id="dockSize" class="dock-slider" min="1" max="100" value="8"></label>
+            <label class="dock-stat"><span class="dock-stat-label">Opacity</span><span class="dock-stat-value"><b id="dockOpacityVal">100</b>%</span><input type="range" id="dockOpacity" class="dock-slider" min="1" max="100" value="100"></label>
+          </div>
+        </div>
+      </div>
+
+      <!-- PIXEL BUILDER VIEW -->
+      <div class="view" data-view="pixel">
+        <div class="pixel-stage">
+          <div class="pixel-grid" id="pixelGrid"></div>
+        </div>
+        <div class="dock">
+          <div class="dock-tools">
+            <button class="dock-tool pixel-color-tool active" data-pcolor="#FE90E8" style="--sw:#FE90E8" aria-pressed="true"><span class="pswatch"></span><span>Pink</span></button>
+            <button class="dock-tool pixel-color-tool" data-pcolor="#99E885" style="--sw:#99E885" aria-pressed="false"><span class="pswatch"></span><span>Green</span></button>
+            <button class="dock-tool pixel-color-tool" data-pcolor="#F7CB46" style="--sw:#F7CB46" aria-pressed="false"><span class="pswatch"></span><span>Gold</span></button>
+            <button class="dock-tool pixel-color-tool" data-pcolor="#C0F7FE" style="--sw:#C0F7FE" aria-pressed="false"><span class="pswatch"></span><span>Mint</span></button>
+            <div class="pixel-custom-wrap">
+              <button class="dock-tool pixel-color-tool" id="pixelCustom" type="button" data-pcolor="#2B2B3A" style="--sw:#2B2B3A" aria-pressed="false" data-color-toggle aria-expanded="false" aria-controls="pixelCustomControls"><span class="pswatch"></span><span>Custom</span></button>
+              <div class="color-picker-popover hidden" id="pixelCustomControls">
+                <div class="color-picker-widget" data-color-widget>
+                  <div class="color-sv-field" data-color-sv role="slider" tabindex="0" aria-label="Saturation and brightness" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" aria-valuetext="100% saturation, 100% brightness"><span class="color-sv-thumb" data-color-thumb></span></div>
+                  <label class="color-hue-control"><span>Hue</span><input class="color-hue-range" type="range" min="0" max="360" value="320" data-color-hue aria-label="Hue"><output data-color-hue-out>320°</output></label>
+                </div>
+              </div>
+            </div>
+            <button class="dock-tool pixel-color-tool" data-pcolor="transparent" style="--sw:#fff" aria-pressed="false"><span class="pswatch eraser-sw"></span><span>Erase</span></button>
+          </div>
+          <div class="dock-divider"></div>
+          <button class="hbtn" id="pixelUseColor" title="Use the colour from the Draw tab">Use canvas colour</button>
+          <div class="difficulty-group"><button class="diff-chip" data-psize="8">8×8</button><button class="diff-chip active" data-psize="16">16×16</button><button class="diff-chip" data-psize="32">32×32</button></div>
+          <button class="hbtn" id="pixelUndo">Undo</button>
+          <button class="hbtn" id="pixelClear">Clear</button>
+          <button class="hbtn primary" id="pixelSend">Send to canvas</button>
+        </div>
+      </div>
+
+      <!-- ANIMATE VIEW -->
+      <div class="view" data-view="animate">
+        <div class="artboard-stage small">
+          <div class="artboard anim-board"><canvas id="animCanvas" class="layer-canvas" role="img" aria-label="Animation preview"></canvas></div>
+        </div>
+        <div class="timeline">
+          <div class="timeline-head">
+            <button class="play-btn" id="playBtn" aria-label="Play"><svg class="i-play" viewBox="0 0 24 24" width="16" height="16"><path d="M6 4l14 8-14 8z" fill="currentColor"/></svg><svg class="i-pause" viewBox="0 0 24 24" width="16" height="16"><path d="M7 4h4v16H7zM13 4h4v16h-4z" fill="currentColor"/></svg></button>
+            <span id="playbackTime">00:00.0 / 00:04</span>
+            <label class="inline-switch"><span>Loop</span><button class="switch on" id="tgLoop" aria-label="Loop playback" aria-pressed="true"></button></label>
+            <span class="tl-actions"><button class="ai-action alt" id="suggestAnimBtn2">Suggest animation</button><button class="ai-action alt" id="exportVideoBtn">Export video</button></span>
+          </div>
+          <div class="timeline-tracks" id="timelineTracks"></div>
+          <div class="kf-editor disabled" id="kfEditor">
+            <div class="kf-hint" id="kfHint">Click a lane to add a keyframe</div>
+            <div class="kf-grid">
+              <label>Move X<input type="range" id="kfX" min="-300" max="300" value="0"><output id="kfXOut">0</output></label>
+              <label>Move Y<input type="range" id="kfY" min="-200" max="200" value="0"><output id="kfYOut">0</output></label>
+              <label>Scale<input type="range" id="kfS" min="20" max="250" value="100"><output id="kfSOut">100%</output></label>
+              <label>Rotate<input type="range" id="kfR" min="-360" max="360" value="0"><output id="kfROut">0°</output></label>
+            </div>
+            <button class="hbtn" id="kfDelete">Delete keyframe</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI STUDIO VIEW -->
+      <div class="view" data-view="ai">
+        <div class="ai-compare">
+          <div class="ai-pane"><span class="ai-pane-tag">Before</span><canvas id="studioBefore" class="studio-cv" width="960" height="540" role="img" aria-label="Your drawing before the filter"></canvas></div>
+          <div class="ai-pane"><span class="ai-pane-tag accent" id="afterTag">After</span><canvas id="studioAfter" class="studio-cv" width="960" height="540" role="img" aria-label="Your drawing after the filter"></canvas></div>
+        </div>
+        <div class="style-chip-row">
+          <button class="style-chip" data-style="Cartoon">Cartoon</button>
+          <button class="style-chip" data-style="Watercolor">Watercolor</button>
+          <button class="style-chip" data-style="Anime">Anime</button>
+          <button class="style-chip" data-style="Pencil sketch">Sketch</button>
+        </div>
+        <div class="ai-suggest-row">
+          <div class="ai-suggest-card" title="How smooth your freehand lines are"><span>Line quality</span><strong id="qLine">—</strong></div>
+          <div class="ai-suggest-card" title="Do your colours work together?"><span>Color harmony</span><strong id="qHarmony">—</strong></div>
+          <div class="ai-suggest-card" title="Range from light to dark"><span>Shading</span><strong id="qShade">—</strong></div>
+        </div>
+        <div class="ai-action-row">
+          <button class="hbtn" id="regenBtn">Regenerate</button>
+          <button class="hbtn" id="revertBtn">Revert</button>
+          <button class="hbtn primary" id="applyBtn">Apply finish</button>
+        </div>
+        <div class="gen-row">
+          <input class="gen-input" id="genPrompt" maxlength="200" placeholder="Optional: tell the AI what to change (e.g. make the sky purple)" aria-label="Extra direction for the AI">
+          <button class="hbtn primary" id="genBtn">✨ Generate with AI</button>
+        </div>
+        <p class="hint-text center" id="genStatus" aria-live="polite"></p>
+        <p class="hint-text center" id="studioNote"></p>
+      </div>
+
+    </main>
+
+    <!-- INSPECTOR: Details (default) / Layers -->
+    <aside class="inspector">
+      <div class="inspector-tabs">
+        <button class="tab active" data-tab="details"><svg viewBox="0 0 24 24" width="14" height="14"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="8" cy="6" r="2" fill="currentColor"/><circle cx="16" cy="12" r="2" fill="currentColor"/><circle cx="10" cy="18" r="2" fill="currentColor"/></svg>Properties</button>
+        <button class="tab" data-tab="layers"><svg viewBox="0 0 24 24" width="14" height="14"><path d="M12 3l9 5-9 5-9-5z" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linejoin="round"/><path d="M3 13l9 5 9-5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linejoin="round"/></svg>Layers</button>
+      </div>
+
+      <div class="inspector-body">
+
+        <!-- DETAILS TAB (default view) — AI Assist up top, then the active tool's settings -->
+        <div class="tab-panel active" data-panel="details">
+
+          <div class="ai-assist" id="aiAssist">
+            <div class="panel-tag">AI ASSIST</div>
+            <div class="ai-score-card">
+              <div class="ai-score-head"><svg viewBox="0 0 24 24" width="14" height="14"><path d="M12 2l1.8 5.6L19 9l-5.2 1.4L12 16l-1.8-5.6L5 9l5.2-1.4z" fill="currentColor"/></svg><span>Composition score</span><strong id="scoreValue">—</strong></div>
+              <div class="score-metric"><span>Balance</span><div class="track"><i id="balBar" style="width:0%"></i></div><b id="balVal">—</b></div>
+              <div class="score-metric"><span>Contrast</span><div class="track"><i id="conBar" style="width:0%"></i></div><b id="conVal">—</b></div>
+              <div class="score-metric"><span>Alignment</span><div class="track"><i id="aliBar" style="width:0%"></i></div><b id="aliVal">—</b></div>
+            </div>
+            <button class="ai-action" id="suggestNextBtn"><svg viewBox="0 0 24 24" width="14" height="14"><path d="M12 2l1.8 5.6L19 9l-5.2 1.4L12 16l-1.8-5.6L5 9l5.2-1.4z" fill="currentColor"/></svg>Guide to missing outline</button>
+            <button class="ai-action alt" id="autoPaletteBtn"><svg viewBox="0 0 24 24" width="14" height="14"><circle cx="12" cy="12" r="9" fill="currentColor"/></svg>Auto-match color palette</button>
+            <button class="ai-action alt" id="cleanLinesBtn"><svg viewBox="0 0 24 24" width="14" height="14"><path d="M4 12a8 8 0 1 0 16 0 8 8 0 0 0-16 0z" stroke="currentColor" stroke-width="2" fill="none"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Smooth &amp; clean lines</button>
+            <div class="style-chip-row">
+          <button class="style-chip" data-style="Cartoon">Cartoon</button>
+          <button class="style-chip" data-style="Watercolor">Watercolor</button>
+          <button class="style-chip" data-style="Anime">Anime</button>
+          <button class="style-chip" data-style="Pencil sketch">Sketch</button>
+        </div>
+          </div>
+
+          <div class="panel-tag hidden" id="detailsTag">SHAPES</div>
+
+          <section class="panel-section hidden" data-section="select">
+            <div class="props-heading">Selection <span id="selName">Nothing selected</span></div>
+            <div class="inspector-section">
+              <div class="section-head">Transform</div>
+              <label class="control-row"><span>X</span><input class="num" type="number" id="selX" disabled></label>
+              <label class="control-row"><span>Y</span><input class="num" type="number" id="selY" disabled></label>
+              <label class="control-row"><span>W</span><input class="num" type="number" id="selW" min="4" disabled></label>
+              <label class="control-row"><span>H</span><input class="num" type="number" id="selH" min="4" disabled></label>
+              <p class="hint-text">Drag to move · corners resize (Shift keeps ratio) · pink handle rotates · arrow keys nudge · Ctrl+D duplicates.</p>
+            </div>
+            <div class="inspector-section">
+              <div class="section-head">Align to canvas</div>
+              <div class="align-group" id="alignGroup">
+                <button class="align-btn" data-align="left" title="Align left"><svg viewBox="0 0 24 24" width="14" height="14"><path d="M4 4v16M9 8h11M9 12h7M9 16h11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+                <button class="align-btn" data-align="center" title="Center horizontally"><svg viewBox="0 0 24 24" width="14" height="14"><path d="M12 4v16M5 8h14M7 12h10M4 16h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+                <button class="align-btn" data-align="right" title="Align right"><svg viewBox="0 0 24 24" width="14" height="14"><path d="M20 4v16M4 8h11M8 12h7M4 16h11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+                <button class="align-btn" data-align="middle" title="Center vertically"><svg viewBox="0 0 24 24" width="14" height="14"><path d="M4 12h16M8 5v14M12 7v10M16 4v16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+              </div>
+            </div>
+            <div class="inspector-section">
+              <div class="section-head">Appearance</div>
+              <label class="control-row"><span>Color</span><input class="color-input" type="color" id="propColor" value="#fe90e8" disabled></label>
+              <div class="control-row"><span>Opacity</span><output id="propOpacityOut">100%</output></div>
+              <input type="range" id="propOpacity" min="0" max="100" value="100" class="full-slider" disabled aria-label="Opacity">
+              <div class="control-row"><span>Corner radius</span><output id="propRadiusOut">0 px</output></div>
+              <input type="range" id="propRadius" min="0" max="80" value="0" class="full-slider" disabled aria-label="Corner radius (boxes only)">
+              <div class="btn-pair"><button class="ai-action alt" id="selDuplicate">Duplicate</button><button class="ai-action alt danger" id="selDelete">Delete</button></div>
+            </div>
+          </section>
+
+          <section class="panel-section hidden" data-section="brush">
+            <h3>Brush</h3>
+            <div class="control-caption">COLOR PALETTE</div>
+            <div class="inline-color-picker">
+              <button class="color-picker-trigger" type="button" data-color-toggle aria-expanded="false" aria-controls="brushColorControls"><span class="picker-trigger-swatch" data-color-chip></span><span class="picker-trigger-label">Custom color</span><b data-color-label>#FE90E8</b></button>
+              <div class="color-picker-popover hidden" id="brushColorControls">
+                <div class="color-picker-widget" data-color-widget>
+                  <div class="color-sv-field" data-color-sv role="slider" tabindex="0" aria-label="Saturation and brightness" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" aria-valuetext="100% saturation, 100% brightness"><span class="color-sv-thumb" data-color-thumb></span></div>
+                  <label class="color-hue-control"><span>Hue</span><input class="color-hue-range" type="range" min="0" max="360" value="320" data-color-hue aria-label="Hue"><output data-color-hue-out>320°</output></label>
+                </div>
+              </div>
+            </div>
+            <div class="palette-grid">
+              <button class="swatch-card selected" data-color="#FE90E8" style="background:#FE90E8"><span>#FE90E8</span></button>
+              <button class="swatch-card" data-color="#C0F7FE" style="background:#C0F7FE"><span>#C0F7FE</span></button>
+              <button class="swatch-card" data-color="#99E885" style="background:#99E885"><span>#99E885</span></button>
+              <button class="swatch-card" data-color="#F7CB46" style="background:#F7CB46"><span>#F7CB46</span></button>
+              <button class="swatch-card" data-color="#FFDC8B" style="background:#FFDC8B"><span>#FFDC8B</span></button>
+              <button class="swatch-card dark" data-color="#2B2B3A" style="background:#2B2B3A"><span>#2B2B3A</span></button>
+            </div>
+            <div class="row-control"><label for="brushHardness">Hardness</label><input type="range" id="brushHardness" min="0" max="100" value="70"><output for="brushHardness" id="brushHardnessOut">70%</output></div>
+            <p class="hint-text">Size and opacity are in the floating toolbar below the canvas.</p>
+            <button class="ai-action alt" id="suggestSizeBtn">Auto-suggest size</button>
+          </section>
+
+          <section class="panel-section hidden" data-section="erase">
+            <h3>Eraser</h3>
+            <div class="row-control"><label for="eraserSize">Size</label><input type="range" id="eraserSize" min="1" max="100" value="24"><output for="eraserSize" id="eraserSizeOut">24px</output></div>
+            <div class="row-control"><label for="eraserHardness">Hardness</label><input type="range" id="eraserHardness" min="0" max="100" value="60"><output for="eraserHardness" id="eraserHardnessOut">60%</output></div>
+            <div class="toggle-row"><span>Erase whole layer (click to delete)</span><button class="switch" id="tgEraseLayer" aria-label="Erase whole layer" aria-pressed="false"></button></div>
+          </section>
+
+          <section class="panel-section hidden" data-section="smudge">
+            <h3>Smudge</h3>
+            <p class="hint-text">Drag across an edge to blend colours. Smudging merges all layers into one bitmap (Ctrl+Z undoes).</p>
+            <div class="row-control"><label for="smudgeStrength">Strength</label><input type="range" id="smudgeStrength" min="0" max="100" value="55"><output for="smudgeStrength" id="smudgeStrengthOut">55%</output></div>
+            <div class="row-control"><label for="smudgeRadius">Radius</label><input type="range" id="smudgeRadius" min="1" max="80" value="20"><output for="smudgeRadius" id="smudgeRadiusOut">20px</output></div>
+          </section>
+
+          <section class="panel-section hidden" data-section="picker">
+            <h3>Color picker</h3>
+            <div class="color-picker-widget" data-color-widget>
+              <div class="color-sv-field" data-color-sv role="slider" tabindex="0" aria-label="Saturation and brightness" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" aria-valuetext="100% saturation, 100% brightness"><span class="color-sv-thumb" data-color-thumb></span></div>
+              <label class="color-hue-control"><span>Hue</span><input class="color-hue-range" type="range" min="0" max="360" value="320" data-color-hue aria-label="Hue"><output data-color-hue-out>320°</output></label>
+            </div>
+            <div class="color-controls">
+              <label class="color-field" for="colorHex"><span>HEX value</span><input type="text" id="colorHex" value="#FE90E8" maxlength="7" spellcheck="false" autocomplete="off"></label>
+            </div>
+            <div class="current-color-preview"><div class="preview-swatch" id="previewSwatch" style="background:#FE90E8"></div><div><strong>Current color</strong><span id="previewHex">#FE90E8</span></div></div>
+            <button class="ai-action alt" id="addColorBtn">Add to palette</button>
+          </section>
+
+          <section class="panel-section hidden" data-section="pan">
+            <h3>Pan &amp; navigate</h3>
+            <p class="hint-text">Drag to pan, or hold <kbd>Space</kbd> and drag anywhere. <kbd>Ctrl</kbd>+scroll zooms; click the zoom tag to cycle.</p>
+            <div class="toggle-row"><span>Lock canvas position</span><button class="switch" id="tgLock" aria-label="Lock canvas position" aria-pressed="false"></button></div>
+          </section>
+
+          <section class="panel-section hidden" data-section="shapes">
+            <h3>Shapes</h3>
+            <p class="hint-text">Pick a shape, then <b>click-drag on the canvas</b> — or drag a tile straight onto it. Tiles marked ✦ match your photo.</p>
+            <div class="shape-grid" aria-label="Drawing shapes">
+              <button class="shape-tile" data-shape="square" aria-label="Square" aria-pressed="false" title="Square"><svg viewBox="0 0 24 24" width="22" height="22"><rect x="4" y="4" width="16" height="16" fill="currentColor"/></svg></button>
+              <button class="shape-tile" data-shape="rect" aria-label="Rectangle" aria-pressed="false" title="Rectangle"><svg viewBox="0 0 24 24" width="22" height="22"><rect x="2" y="6" width="20" height="12" fill="currentColor"/></svg></button>
+              <button class="shape-tile" data-shape="rounded" aria-label="Rounded box" aria-pressed="false" title="Rounded box"><svg viewBox="0 0 24 24" width="22" height="22"><rect x="2" y="6" width="20" height="12" rx="5" fill="currentColor"/></svg></button>
+              <button class="shape-tile active" data-shape="circle" aria-label="Circle" aria-pressed="true" title="Circle"><svg viewBox="0 0 24 24" width="22" height="22"><circle cx="12" cy="12" r="9" fill="currentColor"/></svg></button>
+              <button class="shape-tile" data-shape="ellipse" aria-label="Ellipse" aria-pressed="false" title="Ellipse"><svg viewBox="0 0 24 24" width="22" height="22"><ellipse cx="12" cy="12" rx="10" ry="6.5" fill="currentColor"/></svg></button>
+              <button class="shape-tile" data-shape="triangle" aria-label="Triangle" aria-pressed="false" title="Triangle"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M12 3 22 20H2z" fill="currentColor"/></svg></button>
+              <button class="shape-tile" data-shape="diamond" aria-label="Diamond" aria-pressed="false" title="Diamond"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M12 2 22 12 12 22 2 12z" fill="currentColor"/></svg></button>
+              <button class="shape-tile" data-shape="hexagon" aria-label="Hexagon" aria-pressed="false" title="Hexagon"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M7 4h10l5 8-5 8H7l-5-8z" fill="currentColor"/></svg></button>
+              <button class="shape-tile" data-shape="star" aria-label="Star" aria-pressed="false" title="Star"><svg viewBox="0 0 24 24" width="22" height="22"><path d="m12 2 3 6.8 7.4.7-5.6 4.9 1.7 7.2L12 17.8 5.5 21.6l1.7-7.2L1.6 9.5 9 8.8z" fill="currentColor"/></svg></button>
+              <button class="shape-tile" data-shape="heart" aria-label="Heart" aria-pressed="false" title="Heart"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M12 21 4 12.5C1 9 3.5 4 7.5 4c2 0 3.6 1 4.5 2.6C12.9 5 14.500 4 16.5 4 20.500 4 23 9 20 12.500z" fill="currentColor"/></svg></button>
+              <button class="shape-tile" data-shape="cloud" aria-label="Cloud" aria-pressed="false" title="Cloud"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M6 19a5 5 0 0 1-.7-9.900A7 7 0 0 1 19 8a5.500 5.500 0 0 1-.5 11z" fill="currentColor"/></svg></button>
+              <button class="shape-tile" data-shape="semicircle" aria-label="Half circle" aria-pressed="false" title="Half circle"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M2 18a10 10 0 0 1 20 0z" fill="currentColor"/></svg></button>
+              <button class="shape-tile" data-shape="line" aria-label="Line" aria-pressed="false" title="Line"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M4 20 20 4" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+              <button class="shape-tile" data-shape="arrow" aria-label="Arrow" aria-pressed="false" title="Arrow"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M4 20 20 4M11 4h9v9" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+              <button class="shape-tile" data-shape="curve" aria-label="Curve" aria-pressed="false" title="Curve"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M4 20C4 8 10 4 20 4" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+              <button class="shape-tile" data-shape="wave" aria-label="Wave" aria-pressed="false" title="Wave"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M2 12c3-8 6-8 10 0s7 8 10 0" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            </div>
+            <div class="row-control"><label for="shapeRadius">Box corners</label><input type="range" id="shapeRadius" min="0" max="80" value="14"><output for="shapeRadius" id="shapeRadiusOut">14px</output></div>
+            <div class="toggle-row"><span>Only shapes found in my photo</span><button class="switch on" id="tgPhotoShapes" aria-label="Only show shapes found in my photo" aria-pressed="true"></button></div>
+            <div class="toggle-row"><span>Snap to guides</span><button class="switch on" id="tgSnap" aria-label="Snap to guides" aria-pressed="true"></button></div>
+          </section>
+
+          <section class="panel-section hidden" data-section="fill">
+            <h3>Fill</h3>
+            <div class="control-caption">FILL COLOR</div>
+            <div class="inline-color-picker">
+              <button class="color-picker-trigger" type="button" data-color-toggle aria-expanded="false" aria-controls="fillColorControls"><span class="picker-trigger-swatch" data-color-chip></span><span class="picker-trigger-label">Custom color</span><b data-color-label>#FE90E8</b></button>
+              <div class="color-picker-popover hidden" id="fillColorControls">
+                <div class="color-picker-widget" data-color-widget>
+                  <div class="color-sv-field" data-color-sv role="slider" tabindex="0" aria-label="Saturation and brightness" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" aria-valuetext="100% saturation, 100% brightness"><span class="color-sv-thumb" data-color-thumb></span></div>
+                  <label class="color-hue-control"><span>Hue</span><input class="color-hue-range" type="range" min="0" max="360" value="320" data-color-hue aria-label="Hue"><output data-color-hue-out>320°</output></label>
+                </div>
+              </div>
+            </div>
+            <div class="palette-grid">
+              <button class="swatch-card selected" data-color="#FE90E8" style="background:#FE90E8"><span>#FE90E8</span></button>
+              <button class="swatch-card" data-color="#C0F7FE" style="background:#C0F7FE"><span>#C0F7FE</span></button>
+              <button class="swatch-card" data-color="#99E885" style="background:#99E885"><span>#99E885</span></button>
+              <button class="swatch-card" data-color="#F7CB46" style="background:#F7CB46"><span>#F7CB46</span></button>
+            </div>
+            <div class="row-control"><label for="fillTolerance">Tolerance</label><input type="range" id="fillTolerance" min="0" max="100" value="35"><output for="fillTolerance" id="fillToleranceOut">35%</output></div>
+            
+          </section>
+
+          <section class="panel-section hidden" data-section="text">
+            <h3>Type</h3>
+            <p class="hint-text">Click the canvas, type, press Enter. Resize text with the Select tool.</p>
+            <div class="control-caption">TEXT COLOR</div>
+            <div data-text-color>
+              <div class="inline-color-picker">
+                <button class="color-picker-trigger" type="button" data-color-toggle aria-expanded="false" aria-controls="textColorControls"><span class="picker-trigger-swatch" data-color-chip></span><span class="picker-trigger-label">Custom color</span><b data-color-label>#FE90E8</b></button>
+                <div class="color-picker-popover hidden" id="textColorControls">
+                  <div class="color-picker-widget" data-color-widget>
+                    <div class="color-sv-field" data-color-sv role="slider" tabindex="0" aria-label="Text color saturation and brightness" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" aria-valuetext="100% saturation, 100% brightness"><span class="color-sv-thumb" data-color-thumb></span></div>
+                    <label class="color-hue-control"><span>Hue</span><input class="color-hue-range" type="range" min="0" max="360" value="320" data-color-hue aria-label="Text color hue"><output data-color-hue-out>320°</output></label>
+                  </div>
+                </div>
+              </div>
+              <div class="palette-grid">
+                <button class="swatch-card" data-color="#FE90E8" style="background:#FE90E8"><span>#FE90E8</span></button>
+                <button class="swatch-card" data-color="#C0F7FE" style="background:#C0F7FE"><span>#C0F7FE</span></button>
+                <button class="swatch-card" data-color="#99E885" style="background:#99E885"><span>#99E885</span></button>
+                <button class="swatch-card" data-color="#F7CB46" style="background:#F7CB46"><span>#F7CB46</span></button>
+                <button class="swatch-card" data-color="#2B2B3A" style="background:#2B2B3A"><span>#2B2B3A</span></button>
+              </div>
+            </div>
+            <div class="row-control"><label for="fontSize">Size</label><input type="range" id="fontSize" min="8" max="96" value="24"><output for="fontSize" id="fontSizeOut">24px</output></div>
+            <button class="ai-action alt" id="captionBtn">Caption idea</button>
+            <button class="ai-action alt danger" id="textDeleteBtn">Delete text</button>
+          </section>
+
+          <section class="panel-section hidden" data-section="trace">
+            <h3>Photo-to-trace</h3>
+            <p class="hint-text">Upload a photo or drop one on the canvas. Edge detection turns it into an outline to trace.</p>
+            <input type="file" id="photoInput" accept="image/*" hidden>
+            <button class="ai-action" id="uploadBtn">Upload photo</button>
+            <div class="row-control"><span>Or try a sample</span></div>
+            <div class="difficulty-group inline"><button class="diff-chip sample-chip" data-sample="cat">Cat</button><button class="diff-chip sample-chip" data-sample="house">House</button><button class="diff-chip sample-chip" data-sample="flower">Flower</button></div>
+            <p class="hint-text" id="traceInfo">No photo yet? Upload one or try a sample.</p>
+            <div class="row-control"><span>Outline detail</span></div>
+            <div class="difficulty-group inline">
+              <button class="diff-chip" data-detail="simple">Simple</button>
+              <button class="diff-chip active" data-detail="balanced">Balanced</button>
+              <button class="diff-chip" data-detail="detailed">Detailed</button>
+            </div>
+            <div class="row-control"><span>Difficulty</span></div>
+            <div class="difficulty-group inline">
+              <button class="diff-chip" data-level="easy">Easy</button>
+              
+              <button class="diff-chip" data-level="hard">Hard</button>
+              <button class="diff-chip" data-level="auto" title="Picks a level from your recent scores">Adaptive</button>
+            </div>
+            <div class="row-control"><label for="refOpacity">Photo opacity</label><input type="range" id="refOpacity" min="0" max="100" value="45"><output for="refOpacity" id="refOpacityOut">45%</output></div>
+            <div class="toggle-row"><span>Show outline</span><button class="switch on" id="tgOutline" aria-label="Show outline" aria-pressed="true"></button></div>
+            <div class="btn-pair"><button class="ai-action alt" id="peekBtn">Peek outline</button><button class="ai-action alt danger" id="removePhotoBtn">Remove photo</button></div>
+            <div class="control-row"><span>Accuracy</span><output id="accReadout">—</output></div>
+            <div class="ai-block">
+              <div class="section-head">Photo helpers</div>
+              <button class="ai-action alt" id="identifyBtn">Identify photo</button>
+              <p class="hint-text lesson" id="lessonRecipe"></p>
+              <button class="ai-action alt hidden" id="lessonBtn">Start outline guide</button>
+              <button class="ai-action" id="coachBtn">Get a drawing tip</button>
+              <div class="coach-box hidden" id="coachBox" aria-live="polite"><div class="coach-text" id="coachText"></div></div>
+              <p class="hint-text" id="aiStatus">Checking AI server…</p>
+            </div>
+            
+          </section>
+
+          <section class="panel-section hidden" data-section="motion">
+            <h3>Animate &amp; edit</h3>
+            <p class="hint-text">Every layer can have keyframes. Add some, then play the loop in the Animate tab.</p>
+            <button class="ai-action alt" id="suggestAnimBtn">Suggest animation</button>
+            <button class="ai-action alt" id="kfAddBtn">Add keyframe</button>
+            <button class="ai-action alt" id="playPreviewBtn">Play preview</button>
+            <button class="ai-action alt" id="clearKeysBtn">Clear keyframes on selection</button>
+            <button class="ai-action alt" id="openAnimBtn">Open timeline</button>
+          </section>
+        </div>
+
+        <!-- LAYERS TAB: every object is a layer; click to select, ▲▼ reorder, double-click to rename -->
+        <div class="tab-panel" data-panel="layers">
+          <button class="ai-action alt" id="autoNameBtn">Auto-name layers</button>
+          <div id="layerList"></div>
+          <p class="hint-text">Click a layer to select it or click the element on the canvas. </p>
+        </div>
+
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="welcome hidden" id="welcome" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
+  <div class="welcome-card">
+    <h2 id="welcomeTitle">Welcome to DoodleBrick</h2>
+    <p>Learn to draw by building with shapes.</p>
+    <ol>
+      <li><b>Pick a photo.</b> Try a sample or upload your own.</li>
+      <li><b>Trace it with shapes.</b> Drag shapes onto the outline.</li>
+      <li><b>Watch your score.</b> Then get a drawing tip on what to improve.</li>
+    </ol>
+    <div class="welcome-actions"><button class="hbtn primary" id="welcomeSample">Start with the cat sample</button><button class="hbtn" id="welcomeSkip">Skip</button></div>
+  </div>
+</div>
+<script src="config.js"></script>
+<script src="vision.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
